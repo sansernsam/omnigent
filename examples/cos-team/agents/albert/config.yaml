@@ -54,4 +54,4 @@ tools:
     command: bash
     args:
       - -c
-      - cd /Volumes/SSDT5/dev/ai-agents/albert-brain && exec venv/bin/python -m src.mcp.supabase_mcp_server
+      - cd "${ALBERT_BRAIN_DIR:-/Volumes/SSDT5/dev/ai-agents/albert-brain}" && exec venv/bin/python -m src.mcp.supabase_mcp_server
