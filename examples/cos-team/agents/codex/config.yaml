@@ -12,11 +12,11 @@ executor:
     # ``--dangerously-bypass-approvals-and-sandbox`` — Codex's own inner
     # approval/sandbox layer is disarmed, and only the outer Omnigent OS
     # sandbox (declared below) bounds what it can touch.
-    # That disarm is a human call, so it ships commented out. Until you
-    # uncomment it, headless codex dispatches may stall waiting for
-    # approvals that nothing can answer — Fable will treat that as a boot
-    # failure and route the work to claude_code instead.
-    # yolo: true
+    # That disarm is a human call — Sam signed off 2026-07-24 (PRP-11 revise
+    # round 6): outer Omnigent OS sandbox below (write_paths: worktree only,
+    # blast_radius policy) still bounds what codex can touch even with its
+    # own approval layer disarmed.
+    yolo: true
 
 prompt: |
   You are Codex, a coding sub-agent dispatched by Fable, the COSDENT OS

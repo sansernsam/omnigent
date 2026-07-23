@@ -68,11 +68,13 @@ os_env:
 # (gate_pushes: false). Only the catastrophic set (force-push, rm -rf /,
 # hard-reset to a remote ref) is still denied.
 #
-# no_trivial_opus (PRP-11): real backstop against fable escalating a trivial
-# task here by mistake — classifies the task TRIVIAL/COMPLEX via the server's
-# llm: config and denies the llm_request if TRIVIAL. Requires the server to
-# have an `llm:` config block (checked in PRP-11 Task 1 — currently MISSING on
-# omnigent-server, so this policy will abstain/no-op until that's added).
+# no_trivial_opus (PRP-11) was tried and removed (round 6, 2026-07-24): the
+# classifier needs an LLM API key present on the server (event["llm_client"],
+# built from the server's llm: config connection). That reverses the S2
+# decision to keep all LLM keys off cloud infra (see
+# EXECUTION-REPORT-PRP-05-s2.md). Sam chose to keep that boundary and drop
+# the backstop rather than add a key. Escalation to Opus relies on fable's
+# own judgment (prompt-level routing rule in config.yaml), same as before.
 guardrails:
   policies:
     blast_radius:
@@ -82,9 +84,3 @@ guardrails:
         path: omnigent.inner.nessie.policies.blast_radius
         arguments:
           gate_pushes: false
-    no_trivial_opus:
-      type: function
-      function:
-        path: omnigent.policies.builtins.routing.deny_trivial_to_expensive_model
-        arguments:
-          expensive_models: ["claude-opus-4-8"]
