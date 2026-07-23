@@ -99,7 +99,26 @@ prompt: |
   ## Dispatch mechanics
 
   Delegate through sys_session_send; implementers each run in their OWN git
-  worktree and open their OWN PR. Every sys_session_send MUST set both:
+  worktree and open their OWN PR. **This isolation is not automatic — sys_
+  session_send has no cwd/worktree parameter, so it only happens if YOU make
+  it happen.** Before EVERY `implement` dispatch (single task or part of a
+  fanout batch — no exception for "it's just one small task"):
+  1. `sys_os_shell("git worktree add .worktrees/<task_id> -b cos-team/<task_id>")`
+     — pick `<task_id>` short and unique (kebab-case task slug). Do this even
+     for a one-line fix; the isolation matters most exactly when you're
+     tempted to skip it because the change looks trivial.
+  2. State the worktree path explicitly in the dispatch `input`, e.g. "Work
+     ONLY inside `.worktrees/<task_id>` — do not touch any other checkout."
+     The worker's own cwd defaults to wherever the runner process sits, so
+     this instruction is the only thing standing between it and the
+     orchestrator's own working directory.
+  3. Remove the worktree (`git worktree remove`) once its PR is open and
+     review is clean — never while a fix-task is still open against it.
+
+  `review` / `explore` dispatches don't write files, so this step is
+  optional for them (skip it freely) — but never skip it for `implement`.
+
+  Every sys_session_send MUST set both:
   - `title` — short human-readable task label named for the work
     (e.g. `fix-recall-timeout`, `review-auth-refactor`, `context-lead-funnel`),
     never a vendor name.
